@@ -1038,54 +1038,10 @@ func (bs *BufferList) DrawTimeline(ui *UI, x0, y0, nickColWidth int) {
 			continue
 		}
 
-		var showDate bool
-		if i == 0 || yi <= y0 {
-			showDate = true
-		} else {
-			yb, mb, dd := b.lines[i-1].At.Local().Date()
-			ya, ma, da := b.lines[i].At.Local().Date()
-			showDate = yb != ya || mb != ma || dd != da
-		}
-		if showDate {
-			st := vaxis.Style{
-				Attribute: vaxis.AttrBold,
-			}
-			// as a special case, always draw the first visible message date, even if it is a continuation line
-			yd := yi
-			if yd < y0 {
-				yd = y0
-			}
-			printDate(vx, x0, yd, st, line.At.Local())
-		} else if b.lines[i-1].At.Truncate(time.Minute) != line.At.Truncate(time.Minute) && yi >= y0 {
-			st := vaxis.Style{
-				Foreground: ColorGray,
-			}
-			printTime(vx, x0, yi, st, line.At.Local())
-		}
-
 		if yi >= y0 {
-			identSt := vaxis.Style{
-				Foreground: line.HeadColor,
-			}
-			if line.Highlight {
-				identSt.Attribute |= vaxis.AttrReverse
-			}
-			xb, xe := printIdent(vx, x0+7, yi, nickColWidth, Styled(line.Head, identSt))
-
-			if !strings.HasSuffix(line.Head, "--") && !strings.HasSuffix(line.Head, "!!") {
-				ui.clickEvents = append(ui.clickEvents, clickEvent{
-					xb: xb,
-					xe: xe,
-					y:  yi,
-					event: &events.EventClickNick{
-						EventClick: events.EventClick{
-							NetID:  b.netID,
-							Buffer: b.title,
-						},
-						Nick: line.Head,
-					},
-				})
-			}
+			printTime(vx, x0, yi, vaxis.Style{
+				Attribute: vaxis.AttrBold,
+			}, line.At.Local())
 		}
 
 		x := x1
